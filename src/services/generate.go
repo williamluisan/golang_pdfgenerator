@@ -1,7 +1,6 @@
 package services
 
 import (
-	"log"
 	"path/filepath"
 	"runtime"
 
@@ -13,7 +12,7 @@ type Generate struct {
 	Text string
 }
 
-func (generate *Generate) GeneratePDF() {
+func (generate *Generate) GeneratePDF() error {
 	_, current_folder, _, _ := runtime.Caller(0)
 	config_path := filepath.Dir(current_folder)
 	absolute_path := config_path + "/../../files/pdfs/"
@@ -25,6 +24,8 @@ func (generate *Generate) GeneratePDF() {
 	pdf.Write(lineHt, generate.Text)
 	err := pdf.OutputFileAndClose(absolute_path + generate.Filename + ".pdf")
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
+	
+	return nil
 }

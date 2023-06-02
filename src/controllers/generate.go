@@ -70,9 +70,24 @@ func consumer() {
 
 			generatePdf.Filename = string(d.Body) + "_" + strconv.Itoa(counter)
 			generatePdf.Text = readFile.ReadFile()
-			generatePdf.GeneratePDF()
+			err := generatePdf.GeneratePDF()
+			if err != nil {
+				log.Println("PDF: failed to generate the pdf file " + generatePdf.Filename)
 
+				// ...
+				// retry to generate or
+				// acknowledge message and send email for fail generation
+				// ...
+
+				if err = d.Ack(false); err != nil {
+					log.Fatal("RabbitMQ: failed to acknowledge message in queue: " + string(d.Body))
+				}
+			}
+			
 			log.Println("PDF: " + generatePdf.Filename + " done.")
+			if err = d.Ack(false); err != nil {
+				log.Fatal("RabbitMQ: failed to acknowledge message in queue: " + string(d.Body))
+			}
 
 			counter++
 		}
