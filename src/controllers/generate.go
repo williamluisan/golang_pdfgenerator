@@ -49,7 +49,7 @@ func consumer() {
 	msgs, err := config.RabbitmqChCons.Consume(
 		jobs.Queue.Name, // queue
 		"",     // consumer
-		true,   // auto-ack
+		false,   // auto-ack
 		false,  // exclusive
 		false,  // no-local
 		false,  // no-wait
@@ -76,18 +76,15 @@ func consumer() {
 
 				// ...
 				// retry to generate or
-				// acknowledge message and send email for fail generation
+				// send email for fail generation
 				// ...
-
-				if err = d.Ack(false); err != nil {
-					log.Fatal("RabbitMQ: failed to acknowledge message in queue: " + string(d.Body))
-				}
 			}
 			
-			log.Println("PDF: " + generatePdf.Filename + " done.")
 			if err = d.Ack(false); err != nil {
 				log.Fatal("RabbitMQ: failed to acknowledge message in queue: " + string(d.Body))
 			}
+			
+			log.Println("PDF: " + generatePdf.Filename + " done.")
 
 			counter++
 		}
